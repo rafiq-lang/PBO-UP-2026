@@ -85,3 +85,26 @@ def test_nama_kosong_ditolak() -> None:
 def test_tarif_di_atas_batas_maksimum_ditolak() -> None:
     with pytest.raises(ValueError):
         AlatTani("TR-01", "Traktor", 5_000_001)
+
+def test_tarif_wajar_dipanggil_tanpa_objek() -> None:
+    assert AlatTani.tarif_wajar(150000) is True
+    assert AlatTani.tarif_wajar(5000) is False
+    assert AlatTani.tarif_wajar(6000000) is False
+
+def test_pencacah_naik_untuk_setiap_alat_baru() -> None:
+    jumlah_awal = AlatTani.jumlah_terdaftar()
+
+    AlatTani("TR-99", "Traktor Uji", 150000)
+
+    assert AlatTani.jumlah_terdaftar() == jumlah_awal + 1
+
+def test_konstruktor_dari_baris_csv() -> None:
+    alat = AlatTani.dari_baris_csv("PA-01;Pompa Air;75000")
+
+    assert alat.kode == "PA-01"
+    assert alat.nama == "Pompa Air"
+    assert alat.tarif_harian == 75000
+
+def test_baris_csv_tarif_bukan_angka_ditolak() -> None:
+    with pytest.raises(ValueError):
+        AlatTani.dari_baris_csv("PA-01;Pompa Air;abc")
